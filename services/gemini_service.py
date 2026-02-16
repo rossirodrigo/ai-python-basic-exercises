@@ -15,14 +15,27 @@ class GeminiService:
         self.client = genai.Client(api_key=self.api_key)
         self.model = model
 
+    def send_message(self, prompt):
+        """
+        Sends a prompt to Gemini and returns the response.
+        """
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+            )
+            return response
+        except Exception as e:
+            print(f"Error connecting to Gemini: {e}")
+            raise e
+
     def generate_json(self, prompt, data):
         """
         Sends a prompt and data to Gemini and returns a parsed JSON response.
         """
         try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=f"""
+            response = self.send_message(
+                f"""
                     {prompt}
                     
                     STRICT RULES:
@@ -34,10 +47,8 @@ class GeminiService:
                 """,
             )
 
-            # Clean markdown and whitespace from the response
             clean_text = response.text.replace("```json", "").replace("```", "").strip()
             return json.loads(clean_text)
 
         except Exception as e:
-            print(f"Error connecting to Gemini: {e}")
             raise e
