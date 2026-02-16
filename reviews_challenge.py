@@ -1,10 +1,5 @@
-import sys
 import pandas as pd
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-
-from exercises.services import GeminiService
+from services import GeminiService
 
 df_reviews = pd.read_csv("content/reviews.csv")
 
