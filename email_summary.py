@@ -1,10 +1,4 @@
-import os
-from google import genai
-from dotenv import load_dotenv
-
-load_dotenv()
-
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+from services import GeminiService
 
 email_bodies = [
     "Olá, conforme conversamos, seguem em anexo os relatórios de vendas do último trimestre. Fico à disposição para dúvidas.",
@@ -29,32 +23,18 @@ email_bodies = [
     "Urgente: Precisamos validar os dados da planilha de orçamento antes da reunião com a diretoria às 16h. Pode verificar?",
 ]
 
+prompt = """
+    Act as a data processor. You will receive a list in an array format.
+    Your task is to a JSON format, adding the original text in a key called 'original' and a summarized content in a key called 'summary'.
+"""
 
-def summarize_email_body(email_body):
-    try:
-        response = client.models.generate_content(
-            model="gemini-3-flash-preview",
-            contents=f"""
-                Lendo o conteúdo do e-mail {email_body}, retorne o conteúdo de forma 
-                resumida. Retorne somente o texto.
-            """,
-        )
+gemini = GeminiService()
+result = gemini.generate_json(prompt, email_bodies)
 
-        return response.text
-    except ClientError as e:
-        print(f"Client Error: {e.status_code} - {e.response_json.get('message')}")
-    except ServerError as e:
-        print(f"Server Error: {e.status_code} - {e.response_json.get('message')}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-
-    exit(1)
-
-
-for i, body in enumerate(email_bodies):
-    summarized_email_body = summarize_email_body(body)
-
-    with open(f"content/emails.txt", "a", encoding="utf-8") as file:
+for i, body in enumerate(result):
+    with open(f"content/generated/emails.txt", "a", encoding="utf-8") as file:
         file.write(f"Email {i + 1}:\n")
-        file.write(summarized_email_body)
+        file.write(body["original"])
+        file.write("\n")
+        file.write(body["summary"])
         file.write("\n")
