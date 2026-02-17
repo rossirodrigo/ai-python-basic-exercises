@@ -52,6 +52,7 @@ class LocalLLMService:
             """
 
             response = self.chat_completion(
+                # TODO: chamar prompt base como role system
                 messages=[{"role": "user", "content": full_prompt}]
             )
 
@@ -63,6 +64,7 @@ class LocalLLMService:
                 .strip()
             )
 
+            # TODO: garantir o json correto
             return dirtyjson.loads(clean_text)
         except json.JSONDecodeError as e:
             print(f"Erro na posição {e.pos}: {e.msg}")
