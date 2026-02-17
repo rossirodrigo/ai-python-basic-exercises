@@ -1,0 +1,10 @@
+Email 1:
+Relatórios de vendas do último trimestre em anexo.
+Email 2:
+Você esqueceu seu casaco aqui. Quer vir buscar ou que eu leve?
+Email 3:
+Fatura com vencimento em 10/05 disponível para pagamento.
+Email 4:
+Selecionado para a próxima etapa; agende seu horário.
+Email 5:
+A série comentada estreou hoje e o primeiro episódio está sensacional.

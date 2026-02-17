@@ -1,3 +1,4 @@
+from services.gemini_service import GeminiService
 from services import LocalLLMService
 import pandas as pd
 
@@ -14,8 +15,8 @@ def process_file_lines(file_path: str):
     return reviews
 
 
-def main():
-    reviews = process_file_lines("content/reviews_challenge.txt")
+def main(local: bool):
+    reviews = process_file_lines("content/reviews.txt")
     reviews_split = []
 
     for review in reviews:
@@ -40,21 +41,34 @@ def main():
         1. Keep 'id', 'user' and 'review' fields exactly as they are.
     """
 
-    llm = LocalLLMService()
+    llm = LocalLLMService() if local else GeminiService()
     result = llm.generate_json(prompt, reviews_split)
 
-    df_reviews = pd.DataFrame(
-        {
-            "id": [review["id"] for review in result],
-            "user": [review["user"] for review in result],
-            "review": [review["review"] for review in result],
-            "translation": [review["translation"] for review in result],
-            "rating": [review["rating"] for review in result],
-        }
-    ).set_index("id")
+    df_reviews = (
+        pd.DataFrame(
+            {
+                "id": [review["id"] for review in result],
+                "user": [review["user"] for review in result],
+                "review": [review["review"] for review in result],
+                "translation": [review["translation"] for review in result],
+                "rating": [review["rating"] for review in result],
+            }
+        )
+        .set_index("id")
+        .sort_values(
+            by="rating", key=lambda x: x.map({"Positive": 1, "Negative": 2, "Mixed": 3})
+        )
+    )
 
-    df_reviews.to_csv("content/reviews_challenge_processed.csv", index=True)
+    df_reviews.to_csv("content/generated/reviews_challenge_processed.csv", index=True)
+
+    print(df_reviews.head(5))
 
 
 if __name__ == "__main__":
-    main()
+    llm = input("Choose LLM (gemini, local): ")
+
+    if llm not in ["gemini", "local"]:
+        raise ValueError("Invalid LLM")
+
+    main(llm == "local")

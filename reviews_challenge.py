@@ -28,7 +28,7 @@ def main():
     for d in data:
         df_reviews.at[d["index"], "rating"] = d["rating"]
 
-    df_reviews.to_csv("content/reviews_with_rating.csv", index=False)
+    df_reviews.to_csv("content/generated/reviews_with_rating.csv", index=False)
 
     print("\nProcessing complete! Results saved to 'content/reviews_with_rating.csv'")
     print(df_reviews[["reviewText", "rating"]].head(3))
