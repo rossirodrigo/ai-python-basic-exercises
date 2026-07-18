@@ -6,7 +6,7 @@ prompt = """
     Your task is to a JSON format, adding the original text in a key called 'question' and an answer in a key called 'answer'.
 
     All questions are related to the game Hades II.
-    
+
     STRICT RULES:
     1. The answer should be in Portuguese.
     2. The answer should be concise and straight to the point.

@@ -42,7 +42,7 @@ class LocalLLMService:
         try:
             full_prompt = f"""
                 {prompt}
-                
+
                 STRICT RULES:
                 1. Return ONLY the valid JSON. No conversational text or markdown code blocks.
                 2. Ensure the output is a valid JSON.

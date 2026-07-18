@@ -32,11 +32,11 @@ def main(local: bool):
     prompt = """
         Act as a data processor. You will receive a list of dictionaries (JSON-like).
         Your task is to return the EXACT same list, but adding two new keys called 'translation' and 'rating' to each object.
-        
+
         Inside 'translation', provide a translation of the 'review' field to English.
-        
+
         Inside 'rating', provide a sentiment analysis strict to three options: Positive, Negative, or Mixed.
-        
+
         RULES:
         1. Keep 'id', 'user' and 'review' fields exactly as they are.
     """
