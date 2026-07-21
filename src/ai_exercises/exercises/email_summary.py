@@ -1,6 +1,7 @@
-from services import GeminiService
+from ai_exercises.paths import GENERATED_DATA_DIR
+from ai_exercises.services import GeminiService
 
-email_bodies = [
+EMAIL_BODIES = [
     "Olá, conforme conversamos, seguem em anexo os relatórios de vendas do último trimestre. Fico à disposição para dúvidas.",
     "Oi, tudo bem? Notei que você esqueceu seu casaco aqui em casa ontem. Quer passar aqui para pegar ou prefiro que eu leve?",
     "Prezado cliente, sua fatura com vencimento em 10/05 já está disponível para pagamento. Utilize o código de barras abaixo.",
@@ -23,18 +24,26 @@ email_bodies = [
     "Urgente: Precisamos validar os dados da planilha de orçamento antes da reunião com a diretoria às 16h. Pode verificar?",
 ]
 
-prompt = """
+PROMPT = """
     Act as a data processor. You will receive a list in an array format.
     Your task is to a JSON format, adding the original text in a key called 'original' and a summarized content in a key called 'summary'.
 """
 
-gemini = GeminiService()
-result = gemini.generate_json(prompt, email_bodies)
 
-for i, body in enumerate(result):
-    with open(f"content/generated/emails.txt", "a", encoding="utf-8") as file:
-        file.write(f"Email {i + 1}:\n")
-        file.write(body["original"])
-        file.write("\n")
-        file.write(body["summary"])
-        file.write("\n")
+def main():
+    gemini = GeminiService()
+    result = gemini.generate_json(PROMPT, EMAIL_BODIES)
+
+    output_path = GENERATED_DATA_DIR / "emails.txt"
+
+    for i, body in enumerate(result):
+        with open(output_path, "a", encoding="utf-8") as file:
+            file.write(f"Email {i + 1}:\n")
+            file.write(body["original"])
+            file.write("\n")
+            file.write(body["summary"])
+            file.write("\n")
+
+
+if __name__ == "__main__":
+    main()

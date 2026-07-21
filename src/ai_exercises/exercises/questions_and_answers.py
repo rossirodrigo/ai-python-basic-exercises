@@ -1,7 +1,9 @@
 import pandas as pd
-from services import GeminiService
 
-prompt = """
+from ai_exercises.paths import GENERATED_DATA_DIR, RAW_DATA_DIR
+from ai_exercises.services import GeminiService
+
+PROMPT = """
     Act as a data processor. You will receive a list in an array format.
     Your task is to a JSON format, adding the original text in a key called 'question' and an answer in a key called 'answer'.
 
@@ -21,24 +23,30 @@ prompt = """
     11. The answer should not contain any conversational text.
 """
 
-questions = []
 
-with open(f"content/questions.txt", "r", encoding="utf-8") as file:
-    lines = file.readlines()
+def main():
+    questions = []
 
-    for line in lines:
-        questions.append(line.strip())
+    with open(RAW_DATA_DIR / "questions.txt", "r", encoding="utf-8") as file:
+        lines = file.readlines()
 
-llm = GeminiService()
-result = llm.generate_json(prompt, questions)
+        for line in lines:
+            questions.append(line.strip())
 
-df_questions = pd.DataFrame(
-    {
-        "question": [question["question"] for question in result],
-        "answer": [question["answer"] for question in result],
-    }
-).set_index("question")
+    llm = GeminiService()
+    result = llm.generate_json(PROMPT, questions)
 
-df_questions.to_csv("content/generated/answers.csv")
+    df_questions = pd.DataFrame(
+        {
+            "question": [question["question"] for question in result],
+            "answer": [question["answer"] for question in result],
+        }
+    ).set_index("question")
 
-print(df_questions)
+    df_questions.to_csv(GENERATED_DATA_DIR / "answers.csv")
+
+    print(df_questions)
+
+
+if __name__ == "__main__":
+    main()

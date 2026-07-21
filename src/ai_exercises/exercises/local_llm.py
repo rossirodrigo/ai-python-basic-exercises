@@ -1,4 +1,4 @@
-from services import LocalLLMService
+from ai_exercises.services import LocalLLMService
 
 
 def main():

@@ -1,0 +1,44 @@
+[project]
+name = "ai-exercises"
+version = "0.1.0"
+description = "Practice repository for basic LLM integrations (local and online), chats, models and data manipulation."
+requires-python = ">=3.11"
+dependencies = [
+    "pandas",
+    "numpy",
+    "python-dotenv",
+    "google-genai",
+    "openai",
+    "groq",
+    "dirtyjson",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+basic-chat = "ai_exercises.exercises.basic_chat:main"
+basic-model = "ai_exercises.exercises.basic_model:main"
+groq-chat = "ai_exercises.exercises.groq_chat:main"
+local-llm = "ai_exercises.exercises.local_llm:main"
+product-revenue = "ai_exercises.exercises.product_revenue:main"
+questions-and-answers = "ai_exercises.exercises.questions_and_answers:main"
+email-summary = "ai_exercises.exercises.email_summary:main"
+reviews = "ai_exercises.exercises.reviews:main"
+reviews-challenge = "ai_exercises.exercises.reviews_challenge:cli"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "integration: requires a live external service (Gemini, Groq, or a local LLM server)",
+]
