@@ -20,17 +20,21 @@ Each exercise is a small, self-contained module under `src/ai_exercises/exercise
 
 ## Architecture
 
-- **`src/ai_exercises/services/`** wraps each LLM backend behind a small class exposing a consistent pair of
-  methods: `chat_completion`/`send_message` for raw calls, and `generate_json(prompt, data)` for structured
-  output. `generate_json` always appends strict instructions to the prompt demanding raw JSON (no markdown
-  fences, no conversational text) and then strips/parses the response.
-  - `GeminiService` uses `google.genai`, supports multi-turn chat via `create_chat()`, and parses JSON with the
-    standard `json` module.
-  - `LocalLLMService` talks to an LM Studio server (default `http://127.0.0.1:1234/v1`) through the `openai`
-    SDK, and parses JSON with `dirtyjson` (more tolerant of malformed output) since local models are less
-    reliable at strict JSON.
-  - Both are re-exported from `services/__init__.py` for `from ai_exercises.services import GeminiService, LocalLLMService`.
-  - These services are intentionally **not** being refactored right now — a future pass will revisit them.
+- **`src/ai_exercises/services/`** wraps each LLM backend behind a class implementing the shared
+  `LLMService` interface (`services/base.py`): `chat_completion(messages, temperature=1.0) -> str` takes an
+  OpenAI-style list of `{"role", "content"}` dicts and returns the reply text, and `generate_json(prompt, data)`
+  (implemented once on the base class) appends strict instructions demanding raw JSON, calls
+  `chat_completion`, then strips/parses the response via the subclass's `_parse_json`.
+  - `GeminiService` uses `google.genai`, translating the message list into `contents`/`system_instruction`
+    (user/assistant roles map to `user`/`model`), and parses JSON with the standard `json` module.
+  - `GroqService` and `LocalLLMService` both call OpenAI-compatible chat-completions endpoints (`groq` SDK and
+    an LM Studio server at `http://127.0.0.1:1234/v1` by default, respectively) and pass `messages` straight
+    through. `LocalLLMService` parses JSON with `dirtyjson` (more tolerant of malformed output) since local
+    models are less reliable at strict JSON; `GroqService` uses the standard `json` module.
+  - All three are re-exported from `services/__init__.py`, e.g.
+    `from ai_exercises.services import GeminiService, GroqService, LocalLLMService`.
+  - There's no concept of a stateful chat session in the interface — callers that need multi-turn conversation
+    (e.g. `basic_chat.py`) accumulate the `messages` list themselves between calls.
 - **`src/ai_exercises/exercises/`** holds one module per exercise. Every module exposes a `main()` (the
   entry point wired up in `[project.scripts]`) and, where there's non-trivial logic beyond calling a service,
   factors it into plain functions (e.g. `parse_reviews`, `build_result_dataframe` in `reviews_challenge.py`;
@@ -43,7 +47,6 @@ Each exercise is a small, self-contained module under `src/ai_exercises/exercise
 - **`tests/`** is a pytest suite. Tests that require a live external service (e.g. a running local LLM server)
   are marked `@pytest.mark.integration` and self-skip when the service isn't reachable — see
   `tests/test_local_llm_service.py` for the pattern.
-- There is no Groq service class yet — `exercises/groq_chat.py` calls the `groq` SDK directly.
 
 ## Adding a new exercise
 

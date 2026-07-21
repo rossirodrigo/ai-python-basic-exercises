@@ -1,7 +1,13 @@
 import pandas as pd
 
 from ai_exercises.paths import GENERATED_DATA_DIR, RAW_DATA_DIR
-from ai_exercises.services import GeminiService, LocalLLMService
+from ai_exercises.services import GeminiService, GroqService, LocalLLMService
+
+SERVICES = {
+    "gemini": GeminiService,
+    "groq": GroqService,
+    "local": LocalLLMService,
+}
 
 PROMPT = """
     Act as a data processor. You will receive a list of dictionaries (JSON-like).
@@ -62,11 +68,11 @@ def build_result_dataframe(result):
     )
 
 
-def main(local: bool):
+def main(llm_name: str):
     reviews = process_file_lines(RAW_DATA_DIR / "reviews.txt")
     reviews_split = parse_reviews(reviews)
 
-    llm = LocalLLMService() if local else GeminiService()
+    llm = SERVICES[llm_name]()
     result = llm.generate_json(PROMPT, reviews_split)
 
     df_reviews = build_result_dataframe(result)
@@ -77,12 +83,12 @@ def main(local: bool):
 
 
 def cli():
-    llm = input("Choose LLM (gemini, local): ")
+    llm_name = input(f"Choose LLM ({', '.join(SERVICES)}): ")
 
-    if llm not in ["gemini", "local"]:
+    if llm_name not in SERVICES:
         raise ValueError("Invalid LLM")
 
-    main(llm == "local")
+    main(llm_name)
 
 
 if __name__ == "__main__":
