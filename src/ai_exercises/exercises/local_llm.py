@@ -12,7 +12,7 @@ def main():
         temperature=1.0,
     )
 
-    print(response.choices[0].message.content)
+    print(response)
 
 
 if __name__ == "__main__":

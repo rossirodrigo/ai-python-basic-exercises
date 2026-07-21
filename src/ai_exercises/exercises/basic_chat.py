@@ -3,7 +3,7 @@ from ai_exercises.services import GeminiService
 
 def main():
     gemini = GeminiService()
-    chat = gemini.create_chat()
+    messages = []
 
     while True:
         prompt = input("Send a message (or 'quit' to quit): ")
@@ -11,8 +11,10 @@ def main():
         if prompt == "quit":
             break
 
-        response = gemini.send_message(prompt, chat)
-        print(response.text)
+        messages.append({"role": "user", "content": prompt})
+        reply = gemini.chat_completion(messages)
+        messages.append({"role": "assistant", "content": reply})
+        print(reply)
 
 
 if __name__ == "__main__":

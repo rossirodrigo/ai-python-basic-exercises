@@ -1,17 +1,10 @@
-import os
-
-from dotenv import load_dotenv
-from groq import Groq
+from ai_exercises.services import GroqService
 
 
 def main():
-    load_dotenv()
+    groq = GroqService()
 
-    client = Groq(
-        api_key=os.getenv("GROQ_API_KEY"),
-    )
-
-    chat_completion = client.chat.completions.create(
+    response = groq.chat_completion(
         messages=[
             {"role": "system", "content": "You are a helpful and concise assistant."},
             {
@@ -19,12 +12,10 @@ def main():
                 "content": "What time is it in Brazil right now?",
             },
         ],
-        model="llama-3.3-70b-versatile",
         temperature=0.5,
-        max_tokens=1024,
     )
 
-    print(chat_completion.choices[0].message.content)
+    print(response)
 
 
 if __name__ == "__main__":
